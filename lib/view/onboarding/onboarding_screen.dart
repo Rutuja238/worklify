@@ -33,15 +33,10 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            // Image.asset(
-            //   data.imageAsset,
-            //   height: 250,
-            //   fit: BoxFit.contain,
-            // ),
             AnimatedVideoWidget(
-  videoAssetPath: 'assets/animation/splash_animation.mp4',
-  height: 280,
-),
+              videoAssetPath: 'assets/animation/splash_animation.mp4',
+              height: 280,
+            ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -56,12 +51,13 @@ class OnboardingScreen extends StatelessWidget {
                     backgroundColor: Colors.deepOrange,
                   ),
                   onPressed: () {
-                    // Navigation logic goes here
+                    final vm = Provider.of<OnboardingViewModel>(
+                      context,
+                      listen: false,
+                    );
+                    vm.handleGoogleSignIn(context);
                   },
-                  child: const Text(
-                    'Sign up',
-                    style: TextStyle(fontSize: 18),
-                  ),
+                  child: const Text('Sign up', style: TextStyle(fontSize: 18)),
                 ),
               ),
             ),
