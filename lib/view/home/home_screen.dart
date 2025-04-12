@@ -5,6 +5,8 @@ import 'package:worklify_app/blocs/task/task_bloc.dart';
 import 'package:worklify_app/blocs/task/task_event.dart';
 import 'package:worklify_app/blocs/task/task_state.dart';
 import 'package:worklify_app/routes/app_routes.dart';
+import 'package:worklify_app/view/task/edit_task_screen.dart';
+import 'package:worklify_app/view/task/task_detail_screen.dart';
 import '../../blocs/task/task_bloc.dart';
 import '../../models/task_model.dart';
 
@@ -147,6 +149,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return GestureDetector(
+       onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+         builder: (_) => TaskDetailsScreen(task: task),
+        ),
+      );
+    },
       onLongPress: () {
         showDialog(
           context: context,
