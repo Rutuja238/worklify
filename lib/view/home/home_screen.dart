@@ -31,10 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> _screens = [
-      _buildTaskListView(),     // Home tasks
+      _buildTaskListView(), // Home tasks
       Center(child: Text("Chat Placeholder")),
-      SizedBox(),               // Middle Add Button
-      _buildCalendarView(),     // Calendar screen
+      SizedBox(), // Middle Add Button
+      _buildCalendarView(), // Calendar screen
       Center(child: Text("Profile Placeholder")),
     ];
 
@@ -119,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
             itemCount: tasks.length,
             // itemBuilder: (context, index) => _buildTaskCard(tasks[index]),
             itemBuilder: (context, index) => TaskCard(task: tasks[index]),
-
           );
         } else {
           return const Center(child: Text("Something went wrong"));
@@ -130,6 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCalendarView() {
     return Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start, // 👈 aligns all children to start
       children: [
         TableCalendar(
           focusedDay: _selectedDate,
@@ -153,20 +154,27 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          "Tasks on ${_selectedDate.toLocal().toString().split(' ')[0]}",
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            _isToday(_selectedDate)
+                ? "Today's To-do list"
+                : "Tasks on ${_selectedDate.toLocal().toString().split(' ')[0]}",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.start,
+          ),
         ),
         const SizedBox(height: 8),
         Expanded(
           child: BlocBuilder<TaskBloc, TaskState>(
             builder: (context, state) {
               if (state is TaskLoadedState) {
-                final tasks = state.tasks.where((task) {
-                  return task.dueDate.year == _selectedDate.year &&
-                      task.dueDate.month == _selectedDate.month &&
-                      task.dueDate.day == _selectedDate.day;
-                }).toList();
+                final tasks =
+                    state.tasks.where((task) {
+                      return task.dueDate.year == _selectedDate.year &&
+                          task.dueDate.month == _selectedDate.month &&
+                          task.dueDate.day == _selectedDate.day;
+                    }).toList();
 
                 if (tasks.isEmpty) {
                   return const Center(child: Text("No tasks for this date"));
@@ -175,9 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: tasks.length,
-                  // itemBuilder: (context, index) => _buildTaskCard(tasks[index]),
                   itemBuilder: (context, index) => TaskCard(task: tasks[index]),
-
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -188,4 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+}
+
+bool _isToday(DateTime date) {
+  final now = DateTime.now();
+  return date.year == now.year &&
+      date.month == now.month &&
+      date.day == now.day;
 }
