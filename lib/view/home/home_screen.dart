@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:worklify_app/blocs/task/task_bloc.dart';
 import 'package:worklify_app/blocs/task/task_event.dart';
 import 'package:worklify_app/blocs/task/task_state.dart';
+import 'package:worklify_app/models/task_model.dart';
 import 'package:worklify_app/routes/app_routes.dart';
-import 'package:worklify_app/view/task/edit_task_screen.dart';
 import 'package:worklify_app/view/task/task_detail_screen.dart';
-import '../../blocs/task/task_bloc.dart';
-import '../../models/task_model.dart';
+import 'package:worklify_app/widgets/task_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final User? user = FirebaseAuth.instance.currentUser;
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -29,48 +30,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _screens = [
+      _buildTaskListView(),     // Home tasks
+      Center(child: Text("Chat Placeholder")),
+      SizedBox(),               // Middle Add Button
+      _buildCalendarView(),     // Calendar screen
+      Center(child: Text("Profile Placeholder")),
+    ];
+
     String displayName = user?.displayName ?? "User";
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5FF),
       appBar: AppBar(
         title: Text("Hi, $displayName!"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.black),
-            onPressed: () {
-              Navigator.pushNamed(context, '/profile');
-            },
-          ),
-        ],
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
       ),
-      body: BlocBuilder<TaskBloc, TaskState>(
-        builder: (context, state) {
-          if (state is TaskLoadingState) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is TaskLoadedState) {
-            final tasks = state.tasks;
-
-            if (tasks.isEmpty) {
-              return const Center(child: Text("No tasks yet"));
-            }
-
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                final task = tasks[index];
-                return _buildTaskCard(task);
-              },
-            );
-          } else {
-            return const Center(child: Text("Something went wrong"));
-          }
-        },
-      ),
+      body: _screens[_selectedIndex],
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(bottom: 20.0),
         child: Row(
@@ -79,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _navIcon(Icons.home_outlined, 0),
             _navIcon(Icons.chat_bubble_outline, 1),
             _buildMiddleButton(),
-            _navIcon(Icons.calendar_today_outlined, 2),
-            _navIcon(Icons.person_outline, 3),
+            _navIcon(Icons.calendar_today_outlined, 3),
+            _navIcon(Icons.person_outline, 4),
           ],
         ),
       ),
@@ -119,153 +97,95 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white, size: 30),
-        // onPressed: () {
-        //   Navigator.pushNamed(context, '/createTask');
-        // },
         onPressed: () {
-          Navigator.pushNamed(
-            context,
-            AppRoutes.addTask,
-          ); // ✅ use defined route
+          Navigator.pushNamed(context, AppRoutes.addTask);
         },
       ),
     );
   }
 
-  Widget _buildTaskCard(TaskModel task) {
-    Color categoryColor;
-    switch (task.category.toLowerCase()) {
-      case 'work':
-        categoryColor = Colors.blueAccent;
-        break;
-      case 'exercise':
-        categoryColor = Colors.green;
-        break;
-      case 'personal':
-        categoryColor = Colors.orange;
-        break;
-      default:
-        categoryColor = Colors.grey;
-    }
+  Widget _buildTaskListView() {
+    return BlocBuilder<TaskBloc, TaskState>(
+      builder: (context, state) {
+        if (state is TaskLoadingState) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is TaskLoadedState) {
+          final tasks = state.tasks;
+          if (tasks.isEmpty) {
+            return const Center(child: Text("No tasks yet"));
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: tasks.length,
+            // itemBuilder: (context, index) => _buildTaskCard(tasks[index]),
+            itemBuilder: (context, index) => TaskCard(task: tasks[index]),
 
-    return GestureDetector(
-       onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-         builder: (_) => TaskDetailsScreen(task: task),
-        ),
-      );
-    },
-      onLongPress: () {
-        showDialog(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                title: const Text("Delete Task"),
-                content: const Text(
-                  "Are you sure you want to delete this task?",
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      context.read<TaskBloc>().add(DeleteTaskEvent(task));
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      "Delete",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-        );
+          );
+        } else {
+          return const Center(child: Text("Something went wrong"));
+        }
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    );
+  }
+
+  Widget _buildCalendarView() {
+    return Column(
+      children: [
+        TableCalendar(
+          focusedDay: _selectedDate,
+          firstDay: DateTime(2000),
+          lastDay: DateTime(2100),
+          selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
+          onDaySelected: (selectedDay, _) {
+            setState(() {
+              _selectedDate = selectedDay;
+            });
+          },
+          calendarStyle: CalendarStyle(
+            todayDecoration: BoxDecoration(
+              color: Colors.deepPurple.shade100,
+              shape: BoxShape.circle,
             ),
-          ],
+            selectedDecoration: BoxDecoration(
+              color: Colors.deepPurple,
+              shape: BoxShape.circle,
+            ),
+          ),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 10,
-              height: 60,
-              decoration: BoxDecoration(
-                color: categoryColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    task.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    task.description,
-                    style: const TextStyle(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: Colors.deepPurple,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        task.dueDate.toString().split(' ')[0],
-                        style: const TextStyle(color: Colors.deepPurple),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: categoryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          task.category,
-                          style: TextStyle(
-                            color: categoryColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+        const SizedBox(height: 8),
+        Text(
+          "Tasks on ${_selectedDate.toLocal().toString().split(' ')[0]}",
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
-      ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: BlocBuilder<TaskBloc, TaskState>(
+            builder: (context, state) {
+              if (state is TaskLoadedState) {
+                final tasks = state.tasks.where((task) {
+                  return task.dueDate.year == _selectedDate.year &&
+                      task.dueDate.month == _selectedDate.month &&
+                      task.dueDate.day == _selectedDate.day;
+                }).toList();
+
+                if (tasks.isEmpty) {
+                  return const Center(child: Text("No tasks for this date"));
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: tasks.length,
+                  // itemBuilder: (context, index) => _buildTaskCard(tasks[index]),
+                  itemBuilder: (context, index) => TaskCard(task: tasks[index]),
+
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }
