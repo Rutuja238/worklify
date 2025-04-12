@@ -8,6 +8,7 @@ import 'package:worklify_app/blocs/task/task_state.dart';
 import 'package:worklify_app/models/task_model.dart';
 import 'package:worklify_app/routes/app_routes.dart';
 import 'package:worklify_app/view/task/task_detail_screen.dart';
+import 'package:worklify_app/viewmodel/theme/theme_viewmodel.dart';
 import 'package:worklify_app/widgets/task_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,21 +33,34 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<Widget> _screens = [
       _buildTaskListView(), // Home tasks
-      Center(child: Text("Chat Placeholder")),
+      Center(child: Text("Chat Placeholder", style: Theme.of(context).textTheme.bodyMedium)),
       SizedBox(), // Middle Add Button
       _buildCalendarView(), // Calendar screen
-      Center(child: Text("Profile Placeholder")),
+      Center(child: Text("Profile Placeholder", style: Theme.of(context).textTheme.bodyMedium)),
     ];
 
     String displayName = user?.displayName ?? "User";
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text("Hi, $displayName!"),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
-        foregroundColor: Colors.black,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+        actions: [
+          IconButton(
+            icon: Icon(
+              context.watch<ThemeViewModel>().isDarkMode
+                  ? Icons.wb_sunny
+                  : Icons.nights_stay,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            onPressed: () {
+              context.read<ThemeViewModel>().toggleTheme();
+            },
+          ),
+        ],
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: Padding(
@@ -69,7 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return IconButton(
       icon: Icon(
         icon,
-        color: _selectedIndex == index ? Colors.deepPurple : Colors.grey,
+        color: _selectedIndex == index
+            ? Colors.deepPurple
+            : Theme.of(context).iconTheme.color?.withOpacity(0.6),
         size: 26,
       ),
       onPressed: () {
@@ -112,16 +128,19 @@ class _HomeScreenState extends State<HomeScreen> {
         } else if (state is TaskLoadedState) {
           final tasks = state.tasks;
           if (tasks.isEmpty) {
-            return const Center(child: Text("No tasks yet"));
+            return Center(
+              child: Text("No tasks yet", style: Theme.of(context).textTheme.bodyMedium),
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemCount: tasks.length,
-            // itemBuilder: (context, index) => _buildTaskCard(tasks[index]),
             itemBuilder: (context, index) => TaskCard(task: tasks[index]),
           );
         } else {
-          return const Center(child: Text("Something went wrong"));
+          return Center(
+            child: Text("Something went wrong", style: Theme.of(context).textTheme.bodyMedium),
+          );
         }
       },
     );
@@ -129,8 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCalendarView() {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start, // 👈 aligns all children to start
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TableCalendar(
           focusedDay: _selectedDate,
@@ -160,8 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _isToday(_selectedDate)
                 ? "Today's To-do list"
                 : "Tasks on ${_selectedDate.toLocal().toString().split(' ')[0]}",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            textAlign: TextAlign.start,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         const SizedBox(height: 8),
@@ -169,15 +186,16 @@ class _HomeScreenState extends State<HomeScreen> {
           child: BlocBuilder<TaskBloc, TaskState>(
             builder: (context, state) {
               if (state is TaskLoadedState) {
-                final tasks =
-                    state.tasks.where((task) {
-                      return task.dueDate.year == _selectedDate.year &&
-                          task.dueDate.month == _selectedDate.month &&
-                          task.dueDate.day == _selectedDate.day;
-                    }).toList();
+                final tasks = state.tasks.where((task) {
+                  return task.dueDate.year == _selectedDate.year &&
+                      task.dueDate.month == _selectedDate.month &&
+                      task.dueDate.day == _selectedDate.day;
+                }).toList();
 
                 if (tasks.isEmpty) {
-                  return const Center(child: Text("No tasks for this date"));
+                  return Center(
+                    child: Text("No tasks for this date", style: Theme.of(context).textTheme.bodyMedium),
+                  );
                 }
 
                 return ListView.builder(

@@ -9,6 +9,8 @@ class TaskDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     Color categoryColor;
     switch (task.category.toLowerCase()) {
       case 'work':
@@ -25,8 +27,11 @@ class TaskDetailsScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Task Details'),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        iconTheme: Theme.of(context).iconTheme,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -48,10 +53,9 @@ class TaskDetailsScreen extends StatelessWidget {
           children: [
             Text(
               task.title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -60,23 +64,22 @@ class TaskDetailsScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   task.dueDate.toString().split(' ')[0],
-                  style: const TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),
             const SizedBox(height: 16),
             Text(
               'Category: ${task.category}',
-              style: TextStyle(
-                fontSize: 16,
-                color: categoryColor,
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: categoryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
             const SizedBox(height: 16),
             Text(
               task.description,
-              style: const TextStyle(fontSize: 16),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
         ),
