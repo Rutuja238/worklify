@@ -20,11 +20,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final User? user = FirebaseAuth.instance.currentUser;
 
   @override
-void initState() {
-  super.initState();
-  context.read<TaskBloc>().add(LoadTasksEvent());
-}
-
+  void initState() {
+    super.initState();
+    context.read<TaskBloc>().add(LoadTasksEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,85 +146,115 @@ void initState() {
         categoryColor = Colors.grey;
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 10,
-            height: 60,
-            decoration: BoxDecoration(
-              color: categoryColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  task.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Delete Task"),
+                content: const Text(
+                  "Are you sure you want to delete this task?",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel"),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  task.description,
-                  style: const TextStyle(color: Colors.black54),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: Colors.deepPurple,
+                  TextButton(
+                    onPressed: () {
+                      context.read<TaskBloc>().add(DeleteTaskEvent(task));
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.red),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      task.dueDate.toString().split(' ')[0],
-                      style: const TextStyle(color: Colors.deepPurple),
+                  ),
+                ],
+              ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 10,
+              height: 60,
+              decoration: BoxDecoration(
+                color: categoryColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    task.description,
+                    style: const TextStyle(color: Colors.black54),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.deepPurple,
                       ),
-                      decoration: BoxDecoration(
-                        color: categoryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(width: 6),
+                      Text(
+                        task.dueDate.toString().split(' ')[0],
+                        style: const TextStyle(color: Colors.deepPurple),
                       ),
-                      child: Text(
-                        task.category,
-                        style: TextStyle(
-                          color: categoryColor,
-                          fontWeight: FontWeight.w500,
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: categoryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          task.category,
+                          style: TextStyle(
+                            color: categoryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
