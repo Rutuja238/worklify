@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:worklify_app/blocs/habit/habit_bloc.dart';
 import 'package:worklify_app/models/habit_model.dart';
 import 'package:worklify_app/theme/app_theme.dart';
 import 'package:worklify_app/viewmodel/theme/theme_viewmodel.dart';
@@ -20,8 +21,11 @@ Future<void> main() async {
   // Hive setup
   await Hive.initFlutter();
   Hive.registerAdapter(TaskModelAdapter());
+  Hive.registerAdapter(HabitModelAdapter());
+  Hive.registerAdapter(SubHabitModelAdapter());
   final taskBox = await Hive.openBox<TaskModel>('tasks');
-  await Hive.openBox<TaskModel>('tasksBox');Hive.registerAdapter(HabitModelAdapter());
+  await Hive.openBox<HabitModel>('habits');
+  await Hive.openBox<TaskModel>('tasksBox');
   runApp(MyApp(taskBox: taskBox));
 }
 
@@ -43,6 +47,9 @@ class MyApp extends StatelessWidget {
           return MultiBlocProvider(
             providers: [
               BlocProvider(create: (_) => TaskBloc(taskBox)),
+              BlocProvider<HabitBloc>(
+      create: (_) => HabitBloc(habitBox: Hive.box('habits')),
+    ),
             ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

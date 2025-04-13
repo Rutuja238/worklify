@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worklify_app/view/calendar/calendar_screen.dart';
+import 'package:worklify_app/view/habit/add_habit_screen.dart';
 import 'package:worklify_app/view/task/add_task_screen.dart';
 import '../view/onboarding/onboarding_screen.dart';
 import '../view/home/home_screen.dart';
@@ -13,6 +14,8 @@ class AppRoutes {
 
   static const String calendar = '/calendar';
 
+  static const String addHabit = '/add-habit';
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case onboarding:
@@ -20,11 +23,13 @@ class AppRoutes {
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case profile:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        return MaterialPageRoute(builder: (_) => ProfileDrawer(user: null,));
       case addTask:
         return MaterialPageRoute(builder: (_) => const AddTaskScreen()); //
       case calendar:
         return MaterialPageRoute(builder: (_) => CalendarTaskView());
+      case addHabit:
+        return MaterialPageRoute(builder: (_) => const AddHabitScreen());
       default:
         return MaterialPageRoute(builder: (_) => const Scaffold(
               body: Center(child: Text("No route defined")),
