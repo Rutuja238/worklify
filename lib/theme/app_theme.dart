@@ -11,8 +11,9 @@ class AppTheme {
       elevation: 0,
     ),
     textTheme: const TextTheme(
-    bodyMedium: TextStyle(color: Colors.white),
-    titleMedium: TextStyle(color: Colors.white),
+    bodyMedium: TextStyle(color: Colors.black),
+    titleMedium: TextStyle(color: Colors.black),
+    headlineSmall:TextStyle(color: Colors.black),
   ),
   );
 
@@ -25,5 +26,10 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 0,
     ),
+     textTheme: const TextTheme(
+    bodyMedium: TextStyle(color: Colors.white),
+    titleMedium: TextStyle(color: Colors.white),
+    headlineSmall:TextStyle(color: Colors.white),
+  ),
   );
 }

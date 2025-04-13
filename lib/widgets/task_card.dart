@@ -60,7 +60,7 @@ class TaskCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -88,29 +88,47 @@ class TaskCard extends StatelessWidget {
                 children: [
                   Text(
                     task.title,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 4),
-                  Text(task.description, style: const TextStyle(color: Colors.black54)),
+                  Text(
+                    task.description,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color
+                              ?.withOpacity(0.7),
+                        ),
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 16, color: Colors.deepPurple),
+                      const Icon(Icons.calendar_today,
+                          size: 16, color: Colors.deepPurple),
                       const SizedBox(width: 6),
                       Text(
                         task.dueDate.toString().split(' ')[0],
-                        style: const TextStyle(color: Colors.deepPurple),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.deepPurple,
+                            ),
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: categoryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           task.category,
-                          style: TextStyle(color: categoryColor, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            color: categoryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
