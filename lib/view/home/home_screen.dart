@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,8 +9,10 @@ import 'package:worklify_app/blocs/task/task_state.dart';
 import 'package:worklify_app/models/task_model.dart';
 import 'package:worklify_app/routes/app_routes.dart';
 import 'package:worklify_app/services/auth_service.dart';
+import 'package:worklify_app/view/habit/add_habit_screen.dart';
 import 'package:worklify_app/view/habit/habit_screen.dart';
 import 'package:worklify_app/view/profile/profile_screen.dart';
+import 'package:worklify_app/view/task/add_task_screen.dart';
 import 'package:worklify_app/view/task/task_detail_screen.dart';
 import 'package:worklify_app/viewmodel/theme/theme_viewmodel.dart';
 import 'package:worklify_app/widgets/task_card.dart';
@@ -139,6 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: IconButton(
         icon: const Icon(Icons.add, color: Colors.white, size: 30),
         onPressed: () {
+           // Navigator.pushNamed(context, AppRoutes.addTask);
+          _showAddOptions(context);
         },
       ),
     );
@@ -299,4 +304,76 @@ bool _isToday(DateTime date) {
   return date.year == now.year &&
       date.month == now.month &&
       date.day == now.day;
+}
+
+ void _showAddOptions(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) => Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.check_box_outlined, color: Colors.deepPurple),
+            title: const Text("Add Task"),
+            onTap: () {
+              // Navigator.pop(context);
+              // Navigator.pushNamed(context, AppRoutes.addTask);
+              showAddTaskDialog(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.repeat, color: Colors.deepPurple),
+            title: const Text("Add Habit"),
+            onTap: () {
+              Navigator.pop(context);
+              showAddHabitDialog(context);
+              // Navigator.pushNamed(context, AppRoutes.addHabit); // <-- You'll add this route
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+} 
+
+void showAddHabitDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierColor: Colors.black54, // Semi-transparent dark background
+    builder: (context) => Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: AddHabitDialog(), // Your existing content
+          ),
+        ),
+      );
+}
+
+void showAddTaskDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierColor: Colors.black54, // Semi-transparent dark background
+    builder: (context) => Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).dialogBackgroundColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: SingleChildScrollView(
+            child: AddTaskDialogContent(), // Your existing content
+          ),
+        ),
+      ),
+    ),
+  );
 }

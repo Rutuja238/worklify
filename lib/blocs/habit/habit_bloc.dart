@@ -22,5 +22,43 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
           .toList();
       emit(HabitLoadedState(habits));
     });
+
+    on<DeleteHabitEvent>((event, emit) async {
+  await event.habit.delete(); // delete from Hive
+  final habits = habitBox.values
+      .where((habit) => habit.userId == event.habit.userId)
+      .toList();
+  emit(HabitLoadedState(habits));
+});
+
+on<EditHabitEvent>((event, emit) async {
+  final habit = event.updatedHabit;
+
+  // Replace the habit in Hive
+  final key = habit.key; // Hive stores keys automatically
+  await habitBox.put(key, habit);
+
+  final habits = habitBox.values
+      .where((h) => h.userId == habit.userId)
+      .toList();
+  emit(HabitLoadedState(habits));
+});
+
+on<MarkSubHabitCompletedEvent>((event, emit) async {
+      final habit = habitBox.get(event.habitKey);
+      if (habit != null) {
+        final subHabit = habit.subHabits.firstWhere((sub) => sub.title == event.subHabitTitle);
+        subHabit.isCompleted = true;
+
+        await habit.save(); // Save the updated status
+
+        final habits = habitBox.values
+            .where((habit) => habit.userId == event.userId)
+            .toList();
+        emit(HabitLoadedState(habits));
+      }
+    });
+
+
   }
-} 
+}

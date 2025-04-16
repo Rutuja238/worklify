@@ -25,11 +25,11 @@ class AppRoutes {
       case profile:
         return MaterialPageRoute(builder: (_) => ProfileDrawer(user: null,));
       case addTask:
-        return MaterialPageRoute(builder: (_) => const AddTaskScreen()); //
+        return MaterialPageRoute(builder: (_) =>  AddTaskDialogContent()); //
       case calendar:
         return MaterialPageRoute(builder: (_) => CalendarTaskView());
       case addHabit:
-        return MaterialPageRoute(builder: (_) => const AddHabitScreen());
+        return MaterialPageRoute(builder: (_) =>  AddHabitDialog ());
       default:
         return MaterialPageRoute(builder: (_) => const Scaffold(
               body: Center(child: Text("No route defined")),

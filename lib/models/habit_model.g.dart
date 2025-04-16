@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'habit_model.dart';
 
 // **************************************************************************
@@ -17,23 +19,35 @@ class HabitModelAdapter extends TypeAdapter<HabitModel> {
     return HabitModel(
       id: fields[0] as String,
       title: fields[1] as String,
-      subHabits: (fields[2] as List).cast<SubHabitModel>(),
-      userId: fields[3] as String,
+      colorValue: fields[2] as int,
+      iconCodePoint: fields[3] as int,
+      iconFontFamily: fields[4] as String,
+      subHabits: (fields[5] as List).cast<SubHabitModel>(),
+      userId: fields[6] as String,
+      repeatOption: fields[7] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, HabitModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.subHabits)
+      ..write(obj.colorValue)
       ..writeByte(3)
-      ..write(obj.userId);
+      ..write(obj.iconCodePoint)
+      ..writeByte(4)
+      ..write(obj.iconFontFamily)
+      ..writeByte(5)
+      ..write(obj.subHabits)
+      ..writeByte(6)
+      ..write(obj.userId)
+      ..writeByte(7)
+      ..write(obj.repeatOption);
   }
 
   @override
@@ -60,17 +74,20 @@ class SubHabitModelAdapter extends TypeAdapter<SubHabitModel> {
     return SubHabitModel(
       title: fields[0] as String,
       time: fields[1] as DateTime,
+      isCompleted: fields[2] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SubHabitModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
-      ..write(obj.time);
+      ..write(obj.time)
+      ..writeByte(2)
+      ..write(obj.isCompleted);
   }
 
   @override

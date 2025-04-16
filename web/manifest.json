@@ -1,5 +1,5 @@
 {
-    "name": "worklify_app",
+    "name": "Worklify",
     "short_name": "worklify_app",
     "start_url": ".",
     "display": "standalone",
